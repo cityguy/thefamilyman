@@ -1,6 +1,6 @@
-import { GoogleGenAI } from "@google/genai";
+const { GoogleGenAI } = require("@google/genai");
 
-const ai = new GoogleGenAI({ apiKey: "AIzaSyDkEqiCuc2oah1-HAZYbuSeKxxt0U5hZsA" });
+const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENAI_API_KEY });
 
 const promptText = `Vertical 1080x1920 ultra-realistic 3D render.
 
@@ -26,7 +26,7 @@ Overall Style:
 
 Ultra-realistic 3D render with cinematic quality. Focus on intricate detail for both the action figure and the environment.`;
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
     return;
@@ -42,4 +42,4 @@ export default async function handler(req, res) {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}
+};
