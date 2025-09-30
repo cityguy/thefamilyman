@@ -78,7 +78,7 @@
     statusText.textContent = "Generating image, please wait...";
     resultImage.style.display = 'none';
     try {
-      const response = await fetch('http://localhost:3000/generate-image', {
+      const response = await fetch('https://thefamilyman.vercel.app/generate-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}) // no selfie passed, backend uses prompt only
