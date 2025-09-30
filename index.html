@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GenAI Imagen Ad - Selfie to 3D Render</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 480px;
+    margin: auto;
+    padding: 20px;
+    background: #f2f2f2;
+  }
+  h1 {
+    text-align: center;
+  }
+  img {
+    display: block;
+    margin: 20px auto;
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  button {
+    display: block;
+    margin: 20px auto;
+    padding: 12px 20px;
+    font-size: 18px;
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  button:disabled {
+    background-color: #a0bcd8;
+    cursor: not-allowed;
+  }
+  #status {
+    text-align: center;
+    font-style: italic;
+    margin-top: 15px;
+  }
+</style>
+</head>
+<body>
+<h1>Upload Your Selfie</h1>
+<input type="file" id="selfie-input" accept="image/*" capture="user" />
+<img id="selfie-preview" alt="Selfie Preview" style="display:none" />
+<button id="generate-btn" disabled>Generate 3D Action Figure</button>
+<div id="status"></div>
+<img id="result-image" alt="Generated 3D Render Result" style="display:none" />
+
+<script>
+  const selfieInput = document.getElementById('selfie-input');
+  const selfiePreview = document.getElementById('selfie-preview');
+  const generateBtn = document.getElementById('generate-btn');
+  const statusText = document.getElementById('status');
+  const resultImage = document.getElementById('result-image');
+
+  selfieInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      selfiePreview.src = e.target.result;
+      selfiePreview.style.display = 'block';
+      generateBtn.disabled = false;
+      resultImage.style.display = 'none';
+      statusText.textContent = '';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  generateBtn.addEventListener('click', async () => {
+    generateBtn.disabled = true;
+    statusText.textContent = "Generating image, please wait...";
+    resultImage.style.display = 'none';
+    try {
+      const response = await fetch('http://localhost:3000/generate-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}) // no selfie passed, backend uses prompt only
+      });
+      if (!response.ok) throw new Error(await response.text());
+      const data = await response.json();
+      const imgSrc = `data:image/png;base64,${data.imageBase64}`;
+      resultImage.src = imgSrc;
+      resultImage.style.display = 'block';
+      statusText.textContent = "Image generated successfully!";
+    } catch (err) {
+      statusText.textContent = `Error: ${err.message}`;
+    }
+    generateBtn.disabled = false;
+  });
+</script>
+</body>
+</html>
