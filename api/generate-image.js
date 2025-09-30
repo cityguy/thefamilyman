@@ -32,13 +32,26 @@ module.exports = async (req, res) => {
     return;
   }
   try {
+    // Expecting { imageBase64 } in the request body
+    const { imageBase64 } = req.body;
+
+    if (!imageBase64) {
+      res.status(400).json({ error: "Missing imageBase64 in request body" });
+      return;
+    }
+
+    // Gemini/Imagen API expects the image as a base64 string
     const response = await ai.models.generateImages({
-      model: "imagen-4.0-generate-001",
+      model: "imagen-4.0-edit-001", // Use the edit model
       prompt: promptText,
+      image: {
+        imageBytes: imageBase64,
+      },
       config: { numberOfImages: 1 },
     });
-    const base64Image = response.generatedImages[0].image.imageBytes;
-    res.status(200).json({ imageBase64: base64Image });
+
+    const editedBase64Image = response.generatedImages[0].image.imageBytes;
+    res.status(200).json({ imageBase64: editedBase64Image });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
